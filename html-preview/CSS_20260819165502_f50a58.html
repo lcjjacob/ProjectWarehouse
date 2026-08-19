@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>纯 CSS/SVG 大屏测试</title>
+    <style>
+        body { background: #0e131f; color: #e2e8f0; font-family: sans-serif; padding: 20px; }
+        .card { background: #171d2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #262f45; }
+        .title { color: #06b6d4; border-left: 4px solid #06b6d4; padding-left: 10px; margin-bottom: 15px; font-size: 18px; }
+
+        /* CSS 柱状图 */
+        .bar-chart { display: flex; height: 200px; gap: 15px; padding-top: 20px; }
+        .bar-group { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+        .bar { width: 100%; background: linear-gradient(180deg, #4f46e5, #06b6d4); border-radius: 4px 4px 0 0; transition: height 0.5s; }
+        .bar-label { margin-top: 10px; color: #94a3b8; font-size: 12px; }
+
+        /* 数据卡片 */
+        .stat-card { display: flex; justify-content: space-around; text-align: center; }
+        .stat-item h2 { color: #f59e0b; margin: 0; font-size: 2rem; text-shadow: 0 0 10px rgba(245,158,11,0.3); }
+        .stat-item p { color: #94a3b8; margin: 5px 0 0; }
+    </style>
+</head>
+<body>
+    <div class="card stat-card">
+        <div class="stat-item"><h2>¥1305</h2><p>最新价</p></div>
+        <div class="stat-item"><h2 style="color:#10b981">+2.4%</h2><p>涨幅</p></div>
+    </div>
+
+    <div class="card">
+        <div class="title">📈 纯 CSS 柱状图 (近4季度销量)</div>
+        <div class="bar-chart">
+            <div class="bar-group"><div class="bar" style="height: 60%"></div><div class="bar-label">Q1</div></div>
+            <div class="bar-group"><div class="bar" style="height: 85%"></div><div class="bar-label">Q2</div></div>
+            <div class="bar-group"><div class="bar" style="height: 75%"></div><div class="bar-label">Q3</div></div>
+            <div class="bar-group"><div class="bar" style="height: 100%"></div><div class="bar-label">Q4</div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="title">📉 纯 SVG 折线图 (股价走势)</div>
+        <svg width="100%" height="200" viewBox="0 0 400 200" preserveAspectRatio="none">
+            <!-- 网格线 -->
+            <line x1="0" y1="50" x2="400" y2="50" stroke="#262f45" stroke-dasharray="4"/>
+            <line x1="0" y1="100" x2="400" y2="100" stroke="#262f45" stroke-dasharray="4"/>
+            <line x1="0" y1="150" x2="400" y2="150" stroke="#262f45" stroke-dasharray="4"/>
+
+            <!-- 折线区域填充 -->
+            <polygon points="0,150 100,80 200,110 300,40 400,70 400,200 0,200" fill="rgba(6, 182, 212, 0.2)" />
+            <!-- 折线 -->
+            <polyline points="0,150 100,80 200,110 300,40 400,70" fill="none" stroke="#06b6d4" stroke-width="3" />
+
+            <!-- 数据点 -->
+            <circle cx="0" cy="150" r="4" fill="#fff" />
+            <circle cx="100" cy="80" r="4" fill="#fff" />
+            <circle cx="200" cy="110" r="4" fill="#fff" />
+            <circle cx="300" cy="40" r="4" fill="#fff" />
+            <circle cx="400" cy="70" r="4" fill="#fff" />
+        </svg>
+    </div>
+</body>
+</html>
