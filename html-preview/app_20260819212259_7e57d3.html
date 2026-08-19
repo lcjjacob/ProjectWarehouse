@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大明白功能测试仪表盘</title>
+<style>
+body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 20px; min-height: 100vh; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { color: #fff; text-align: center; font-size: 28px; margin-bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+.card { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); transition: transform 0.3s; }
+.card:hover { transform: translateY(-5px); }
+.card .icon { font-size: 32px; margin-bottom: 10px; }
+.card .name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 8px; }
+.card .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+.status-pass { background: #d4edda; color: #155724; }
+.status-fail { background: #f8d7da; color: #721c24; }
+.summary { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center; }
+.summary .big { font-size: 48px; font-weight: 700; color: #667eea; }
+.summary .label { font-size: 14px; color: #666; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🚀 大明白功能测试仪表盘</h1>
+<div class="grid">
+<div class="card"><div class="icon">📈</div><div class="name">股票行情查询</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">🏢</div><div class="name">企业工商查询</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">🌐</div><div class="name">联网搜索</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">💬</div><div class="name">历史对话查询</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">📊</div><div class="name">图表生成</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">🧠</div><div class="name">思维导图</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">📄</div><div class="name">飞书文档</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">📋</div><div class="name">飞书表格</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">⏰</div><div class="name">定时任务</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">🔊</div><div class="name">语音合成</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">🗺️</div><div class="name">地图周边搜索</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">📚</div><div class="name">学术文献检索</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">🐙</div><div class="name">GitHub洞察</div><span class="status status-pass">✅ 正常</span></div>
+<div class="card"><div class="icon">📝</div><div class="name">PDF转换</div><span class="status status-pass">✅ 正常</span></div>
+</div>
+<div class="summary">
+<div class="big">14 / 14</div>
+<div class="label">全部功能测试通过</div>
+</div>
+</div>
+</body>
+</html>
