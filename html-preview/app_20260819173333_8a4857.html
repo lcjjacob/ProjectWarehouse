@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>修复版多类型可视化图表测试仪表盘</title>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  color: #fff;
+  padding: 30px 20px;
+}
+h1 { text-align: center; margin-bottom: 8px; font-size: 26px; }
+.subtitle { text-align: center; opacity: 0.7; margin-bottom: 30px; font-size: 14px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.card-title { font-size: 16px; font-weight: 600; }
+.badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  background: rgba(0,210,255,0.2); border: 1px solid rgba(0,210,255,0.4); color: #00d2ff;
+}
+.chart-box { width: 100%; height: 300px; }
+.controls { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.btn {
+  padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 500; transition: all 0.2s;
+  background: linear-gradient(135deg, #00d2ff, #3a7bd5); color: #fff;
+}
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn:active { transform: scale(0.95); }
+.btn.secondary { background: rgba(255,255,255,0.15); }
+.status { margin-top: 10px; font-size: 12px; opacity: 0.8; min-height: 18px; }
+</style>
+</head>
+<body>
+<h1>📊 多类型可视化图表测试仪表盘</h1>
+<p class="subtitle">修复版 · 强化事件绑定兼容性</p>
+
+<div class="grid">
+  <!-- 折线图 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📈 销售趋势</span><span class="badge">Line</span></div>
+    <div id="lineChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="line-add">➕ 添加数据</button>
+      <button class="btn secondary" data-action="line-reset">🔄 重置</button>
+    </div>
+    <div class="status" id="lineStatus" style="width: 100%; height: 400px;">📈 折线图已就绪</div>
+  </div>
+
+  <!-- 柱状图 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 部门绩效</span><span class="badge">Bar</span></div>
+    <div id="barChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="bar-add">➕ 添加部门</button>
+      <button class="btn secondary" data-action="bar-reset">🔄 重置</button>
+    </div>
+    <div class="status" id="barStatus" style="width: 100%; height: 400px;">📊 柱状图已就绪</div>
+  </div>
+
+  <!-- 饼图 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">🍩 市场份额</span><span class="badge">Pie</span></div>
+    <div id="pieChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="pie-random">🎲 随机数据</button>
+    </div>
+    <div class="status" id="pieStatus" style="width: 100%; height: 400px;">🍩 饼图已就绪</div>
+  </div>
+
+  <!-- 散点图 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">🔵 样本分布</span><span class="badge">Scatter</span></div>
+    <div id="scatterChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="scatter-random">🎲 随机数据</button>
+    </div>
+    <div class="status" id="scatterStatus" style="width: 100%; height: 400px;">🔵 散点图已就绪</div>
+  </div>
+
+  <!-- 面积图 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">🌊 用户增长</span><span class="badge">Area</span></div>
+    <div id="areaChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="area-add">➕ 添加数据</button>
+      <button class="btn secondary" data-action="area-reset">🔄 重置</button>
+    </div>
+    <div class="status" id="areaStatus" style="width: 100%; height: 400px;">🌊 面积图已就绪</div>
+  </div>
+
+  <!-- 雷达图 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">🕸️ 能力评估</span><span class="badge">Radar</span></div>
+    <div id="radarChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="radar-random">🎲 随机数据</button>
+    </div>
+    <div class="status" id="radarStatus" style="width: 100%; height: 400px;">🕸️ 雷达图已就绪</div>
+  </div>
+</div>
+
+<script>
+window.onload = function() {
+  // 折线图
+  var lineChart = echarts.init(document.getElementById('lineChart'));
+  var lineData = [120, 200, 150, 280, 260, 320, 380];
+  var lineMonths = ['1月','2月','3月','4月','5月','6月','7月'];
+  function renderLine() {
+    lineChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 40, right: 20, top: 30, bottom: 30 },
+      xAxis: { type: 'category', data: lineMonths, axisLine: { lineStyle: { color: '#888' } } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: '#888' } }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+      series: [{
+        name: '销售额', type: 'line', smooth: true, data: lineData,
+        lineStyle: { width: 3, color: '#00d2ff' },
+        itemStyle: { color: '#00d2ff' },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,210,255,0.4)'},{offset:1,color:'rgba(0,210,255,0)'}]) }
+      }]
+    });
+  }
+  renderLine();
+
+  // 柱状图
+  var barChart = echarts.init(document.getElementById('barChart'));
+  var barData = [85, 92, 78, 88, 95, 80];
+  var barDepts = ['研发部','市场部','销售部','运营部','产品部','人事部'];
+  function renderBar() {
+    barChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 40, right: 20, top: 30, bottom: 30 },
+      xAxis: { type: 'category', data: barDepts, axisLine: { lineStyle: { color: '#888' } } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: '#888' } }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+      series: [{
+        name: '绩效分', type: 'bar', data: barData, barWidth: 30,
+        itemStyle: { borderRadius: [6,6,0,0], color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#7b2ff7'},{offset:1,color:'#00d2ff'}]) }
+      }]
+    });
+  }
+  renderBar();
+
+  // 饼图
+  var pieChart = echarts.init(document.getElementById('pieChart'));
+  var pieData = [{name:'手机',value:35},{name:'电脑',value:25},{name:'家电',value:20},{name:'穿戴',value:12},{name:'其他',value:8}];
+  function renderPie() {
+    pieChart.setOption({
+      tooltip: { trigger: 'item' },
+      series: [{
+        type: 'pie', radius: ['45%','70%'], center: ['50%','50%'],
+        itemStyle: { borderRadius: 8, borderColor: '#24243e', borderWidth: 2 },
+        label: { color: '#fff' },
+        data: pieData
+      }]
+    });
+  }
+  renderPie();
+
+  // 散点图
+  var scatterChart = echarts.init(document.getElementById('scatterChart'));
+  function genScatter() {
+    var arr = [];
+    for (var i = 0; i < 30; i++) {
+      arr.push([Math.round(Math.random()*100), Math.round(Math.random()*100)]);
+    }
+    return arr;
+  }
+  var scatterData = genScatter();
+  function renderScatter() {
+    scatterChart.setOption({
+      tooltip: { trigger: 'item' },
+      grid: { left: 40, right: 20, top: 30, bottom: 30 },
+      xAxis: { type: 'value', axisLine: { lineStyle: { color: '#888' } }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: '#888' } }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+      series: [{
+        type: 'scatter', data: scatterData, symbolSize: 12,
+        itemStyle: { color: '#ff6b6b', opacity: 0.8 }
+      }]
+    });
+  }
+  renderScatter();
+
+  // 面积图
+  var areaChart = echarts.init(document.getElementById('areaChart'));
+  var areaData = [50, 80, 120, 180, 240, 300, 380, 450];
+  var areaWeeks = ['第1周','第2周','第3周','第4周','第5周','第6周','第7周','第8周'];
+  function renderArea() {
+    areaChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 40, right: 20, top: 30, bottom: 30 },
+      xAxis: { type: 'category', data: areaWeeks, axisLine: { lineStyle: { color: '#888' } } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: '#888' } }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+      series: [{
+        name: '用户数', type: 'line', smooth: true, data: areaData,
+        lineStyle: { width: 3, color: '#4ecdc4' },
+        itemStyle: { color: '#4ecdc4' },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(78,205,196,0.5)'},{offset:1,color:'rgba(78,205,196,0)'}]) }
+      }]
+    });
+  }
+  renderArea();
+
+  // 雷达图
+  var radarChart = echarts.init(document.getElementById('radarChart'));
+  var radarData = [85, 78, 92, 70, 88, 95];
+  var radarIndicators = [
+    { name: '技术', max: 100 }, { name: '沟通', max: 100 }, { name: '执行', max: 100 },
+    { name: '创新', max: 100 }, { name: '协作', max: 100 }, { name: '学习', max: 100 }
+  ];
+  function renderRadar() {
+    radarChart.setOption({
+      tooltip: {},
+      radar: {
+        indicator: radarIndicators,
+        radius: '65%',
+        axisName: { color: '#fff' },
+        splitArea: { areaStyle: { color: ['rgba(255,255,255,0.02)','rgba(255,255,255,0.05)'] } },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } }
+      },
+      series: [{
+        type: 'radar', data: [{ value: radarData, name: '能力评估' }],
+        areaStyle: { color: 'rgba(0,210,255,0.3)' },
+        lineStyle: { color: '#00d2ff', width: 2 },
+        itemStyle: { color: '#00d2ff' }
+      }]
+    });
+  }
+  renderRadar();
+
+  // 事件委托：统一绑定所有按钮
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    if (!action) return;
+
+    if (action === 'line-add') {
+      var m = lineMonths.length + 1;
+      lineMonths.push(m + '月');
+      lineData.push(Math.round(Math.random()*200 + 100));
+      renderLine();
+      document.getElementById('lineStatus').textContent = '📈 已添加 ' + m + ' 月数据';
+    } else if (action === 'line-reset') {
+      lineData = [120, 200, 150, 280, 260, 320, 380];
+      lineMonths = ['1月','2月','3月','4月','5月','6月','7月'];
+      renderLine();
+      document.getElementById('lineStatus').textContent = '📈 已重置折线图';
+    } else if (action === 'bar-add') {
+      var d = barDepts.length + 1;
+      barDepts.push('部门' + d);
+      barData.push(Math.round(Math.random()*40 + 60));
+      renderBar();
+      document.getElementById('barStatus').textContent = '📊 已添加部门' + d;
+    } else if (action === 'bar-reset') {
+      barData = [85, 92, 78, 88, 95, 80];
+      barDepts = ['研发部','市场部','销售部','运营部','产品部','人事部'];
+      renderBar();
+      document.getElementById('barStatus').textContent = '📊 已重置柱状图';
+    } else if (action === 'pie-random') {
+      pieData = [
+        {name:'手机',value:Math.round(Math.random()*40+10)},
+        {name:'电脑',value:Math.round(Math.random()*30+10)},
+        {name:'家电',value:Math.round(Math.random()*25+5)},
+        {name:'穿戴',value:Math.round(Math.random()*20+5)},
+        {name:'其他',value:Math.round(Math.random()*15+3)}
+      ];
+      renderPie();
+      document.getElementById('pieStatus').textContent = '🍩 已随机生成新的市场份额数据';
+    } else if (action === 'scatter-random') {
+      scatterData = genScatter();
+      renderScatter();
+      document.getElementById('scatterStatus').textContent = '🔵 已随机生成新的样本分布';
+    } else if (action === 'area-add') {
+      var w = areaWeeks.length + 1;
+      areaWeeks.push('第' + w + '周');
+      areaData.push(Math.round(Math.random()*150 + 300));
+      renderArea();
+      document.getElementById('areaStatus').textContent = '🌊 已添加第' + w + '周数据';
+    } else if (action === 'area-reset') {
+      areaData = [50, 80, 120, 180, 240, 300, 380, 450];
+      areaWeeks = ['第1周','第2周','第3周','第4周','第5周','第6周','第7周','第8周'];
+      renderArea();
+      document.getElementById('areaStatus').textContent = '🌊 已重置面积图';
+    } else if (action === 'radar-random') {
+      radarData = radarData.map(function() { return Math.round(Math.random()*40 + 55); });
+      renderRadar();
+      document.getElementById('radarStatus').textContent = '🕸️ 已随机生成新的 6 维能力评估数据';
+    }
+  });
+
+  // 窗口自适应
+  window.addEventListener('resize', function() {
+    lineChart.resize(); barChart.resize(); pieChart.resize();
+    scatterChart.resize(); areaChart.resize(); radarChart.resize();
+  });
+};
+</script>
+</body>
+</html>
