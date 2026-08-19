@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>ECharts 全图表类型大屏</title>
+    <!-- 【红线1】强制使用 BootCDN -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0e131f; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        h1 { text-align: center; color: #06b6d4; margin-bottom: 25px; text-shadow: 0 0 15px rgba(6,182,212,0.4); }
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .card { background: #171d2d; border-radius: 12px; padding: 15px; border: 1px solid #262f45; }
+        /* 【红线3】容器必须显式设置宽高 */
+        .chart { width: 100%; height: 320px; }
+        .title { color: #94a3b8; font-size: 14px; margin-bottom: 10px; border-left: 4px solid #4f46e5; padding-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>📊 ECharts 全图表类型可视化大屏</h1>
+    <div class="grid-container">
+        <div class="card"><div class="title">1. 柱状图</div><div id="bar" class="chart"></div></div>
+        <div class="card"><div class="title">2. 折线图</div><div id="line" class="chart"></div></div>
+        <div class="card"><div class="title">3. 饼图</div><div id="pie" class="chart"></div></div>
+        <div class="card"><div class="title">4. 散点图</div><div id="scatter" class="chart"></div></div>
+        <div class="card"><div class="title">5. 雷达图</div><div id="radar" class="chart"></div></div>
+        <div class="card"><div class="title">6. 仪表盘</div><div id="gauge" class="chart"></div></div>
+        <div class="card"><div class="title">7. 漏斗图</div><div id="funnel" class="chart"></div></div>
+        <div class="card"><div class="title">8. 热力图</div><div id="heatmap" class="chart"></div></div>
+        <div class="card"><div class="title">9. K线图</div><div id="kline" class="chart"></div></div>
+    </div>
+
+    <!-- 【红线2】JS 必须包裹在 window.onload 中 -->
+    <script>
+        window.onload = function() {
+            // 通用暗黑主题坐标轴配置
+            const axisLine = { lineStyle: { color: '#262f45' } };
+            const splitLine = { lineStyle: { color: '#262f45', type: 'dashed' } };
+            const textStyle = { color: '#94a3b8' };
+
+            // 1. 柱状图
+            echarts.init(document.getElementById('bar')).setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: ['A','B','C','D','E'], axisLine },
+                yAxis: { type: 'value', axisLine, splitLine },
+                series: [{ type: 'bar', data: [120, 200, 150, 80, 70], itemStyle: { color: '#4f46e5', borderRadius: [4,4,0,0] } }]
+            });
+
+            // 2. 折线图
+            echarts.init(document.getElementById('line')).setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], axisLine },
+                yAxis: { type: 'value', axisLine, splitLine },
+                series: [{ type: 'line', data: [150, 230, 224, 218, 135, 147, 260], smooth: true, lineStyle: { color: '#06b6d4', width: 3 }, itemStyle: { color: '#06b6d4' }, areaStyle: { color: 'rgba(6,182,212,0.2)' } }]
+            });
+
+            // 3. 饼图
+            echarts.init(document.getElementById('pie')).setOption({
+                tooltip: { trigger: 'item' },
+                legend: { bottom: '5%', left: 'center', textStyle },
+                series: [{ type: 'pie', radius: ['40%', '70%'], data: [{value:1048,name:'搜索引擎'},{value:735,name:'直接访问'},{value:580,name:'邮件营销'},{value:484,name:'联盟广告'},{value:300,name:'视频广告'}], label: { color: '#e2e8f0' } }]
+            });
+
+            // 4. 散点图
+            echarts.init(document.getElementById('scatter')).setOption({
+                tooltip: { trigger: 'item' },
+                xAxis: { type: 'value', axisLine, splitLine, scale: true },
+                yAxis: { type: 'value', axisLine, splitLine, scale: true },
+                series: [{ type: 'scatter', symbolSize: 20, data: [[10.0, 8.04],[8.07, 6.95],[13.0, 7.58],[9.05, 8.81],[11.0, 8.33],[14.0, 7.66]], itemStyle: { color: '#10b981' } }]
+            });
+
+            // 5. 雷达图
+            echarts.init(document.getElementById('radar')).setOption({
+                tooltip: {},
+                radar: { indicator: [{name: '销售', max: 6500},{name: '管理', max: 16000},{name: '技术', max: 30000},{name: '客服', max: 38000},{name: '研发', max: 52000}], axisName: textStyle, splitLine: { lineStyle: { color: '#262f45' } }, splitArea: { areaStyle: { color: ['transparent'] } }, axisLine: { lineStyle: { color: '#262f45' } } },
+                series: [{ type: 'radar', data: [{ value: [4200, 3000, 20000, 35000, 50000], name: '预算 vs 实际' }], areaStyle: { color: 'rgba(139,92,246,0.3)' }, lineStyle: { color: '#8b5cf6' } }]
+            });
+
+            // 6. 仪表盘
+            echarts.init(document.getElementById('gauge')).setOption({
+                series: [{ type: 'gauge', progress: { show: true, width: 18, itemStyle: { color: '#06b6d4' } }, axisLine: { lineStyle: { width: 18, color: [[0.7, '#262f45']] } }, detail: { valueAnimation: true, formatter: '{value}%', color: '#e2e8f0', fontSize: 24 }, data: [{ value: 72, name: '完成率', title: { color: '#94a3b8' } }] }]
+            });
+
+            // 7. 漏斗图
+            echarts.init(document.getElementById('funnel')).setOption({
+                tooltip: { trigger: 'item', formatter: '{a} <br/>{b} : {c}%' },
+                series: [{ type: 'funnel', left: '10%', width: '80%', label: { color: '#e2e8f0' }, data: [{ value: 60, name: '访问' }, { value: 40, name: '咨询' }, { value: 20, name: '订单' }, { value: 80, name: '点击' }, { value: 100, name: '展现' }] }]
+            });
+
+            // 8. 热力图
+            const hours = ['12a','1a','2a','3a','4a','5a','6a','7a','8a'];
+            const days = ['周六','周五','周四','周三','周二','周一','周日'];
+            const heatData = [];
+            for (let i = 0; i < 7; i++) for (let j = 0; j < 9; j++) heatData.push([j, i, Math.floor(Math.random()*100)]);
+            echarts.init(document.getElementById('heatmap')).setOption({
+                tooltip: { position: 'top' },
+                grid: { height: '70%', top: '5%' },
+                xAxis: { type: 'category', data: hours, axisLine },
+                yAxis: { type: 'category', data: days, axisLine },
+                visualMap: { min: 0, max: 100, calculable: true, orient: 'horizontal', left: 'center', bottom: '2%', textStyle, inRange: { color: ['#1e293b','#4f46e5','#06b6d4'] } },
+                series: [{ type: 'heatmap', data: heatData, label: { show: false } }]
+            });
+
+            // 9. K线图
+            echarts.init(document.getElementById('kline')).setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: ['周一','周二','周三','周四','周五'], axisLine },
+                yAxis: { type: 'value', scale: true, axisLine, splitLine },
+                series: [{ type: 'candlestick', data: [[20, 30, 10, 35], [30, 35, 25, 40], [35, 45, 30, 50], [45, 50, 40, 60], [50, 55, 45, 65]], itemStyle: { color: '#ec4899', color0: '#10b981', borderColor: '#ec4899', borderColor0: '#10b981' } }]
+            });
+
+            // 响应式重绘
+            window.addEventListener('resize', function() {
+                document.querySelectorAll('.chart').forEach(el => {
+                    const inst = echarts.getInstanceByDom(el);
+                    if (inst) inst.resize();
+                });
+            });
+        };
+    </script>
+</body>
+</html>
