@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交互式HTML功能完整测试</title>
+<script>
+(function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js';
+    script.onload = function() {
+        // ECharts 加载成功后，强制触发 window.onload，确保大模型写的初始化代码被执行
+        if (typeof window.onload === 'function') {
+            window.onload();
+        }
+    };
+    script.onerror = function() {
+        // 主 CDN 挂了，自动切换备用 CDN
+        var backup = document.createElement('script');
+        backup.src = 'https://lib.baomitu.com/echarts/5.4.3/echarts.min.js';
+        backup.onload = function() {
+            if (typeof window.onload === 'function') {
+                window.onload();
+            }
+        };
+        document.head.appendChild(backup);
+    };
+    document.head.appendChild(script);
+})();
+</script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  color: #fff;
+  padding: 30px 20px;
+}
+h1 { text-align: center; margin-bottom: 8px; font-size: 26px; letter-spacing: 2px; }
+.subtitle { text-align: center; color: #aaa; margin-bottom: 30px; font-size: 14px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+.card h3 { font-size: 16px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.badge {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: rgba(0,210,255,0.2); border: 1px solid rgba(0,210,255,0.4);
+  color: #00d2ff; margin-left: auto;
+}
+.chart-box { width: 100%; height: 260px; margin: 12px 0; }
+.controls { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 600; transition: all 0.2s;
+  background: linear-gradient(135deg, #00d2ff, #3a7bd5); color: #fff;
+}
+.btn:hover { transform: scale(1.05); opacity: 0.9; }
+.btn.secondary { background: linear-gradient(135deg, #f7971e, #ffd200); color: #333; }
+.btn.danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.status {
+  margin-top: 10px; font-size: 12px; color: #00d2ff;
+  min-height: 18px; padding: 4px 8px; background: rgba(0,210,255,0.08);
+  border-radius: 6px;
+}
+.counter-display {
+  font-size: 48px; font-weight: 800; text-align: center; margin: 10px 0;
+  color: #00d2ff; text-shadow: 0 0 20px rgba(0,210,255,0.5);
+}
+.slider-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+input[type=range] { flex: 1; accent-color: #00d2ff; }
+.progress-bar {
+  height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-top: 8px;
+}
+.progress-fill {
+  height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #7b2ff7);
+  border-radius: 5px; transition: width 0.3s;
+}
+.tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.tag {
+  padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 13px;
+  background: rgba(0,210,255,0.15); border: 1px solid rgba(0,210,255,0.3);
+  transition: all 0.2s; user-select: none;
+}
+.tag.active { background: rgba(0,210,255,0.5); border-color: #00d2ff; font-weight: 700; }
+</style>
+</head>
+<body>
+<h1>🎯 交互式 HTML 功能完整测试</h1>
+<p class="subtitle">涵盖计数器 / 折线图 / 柱状图 / 饼图 / 散点图 / 滑块 / 标签选择 七大交互模块</p>
+
+<div class="grid">
+  <!-- 计数器 -->
+  <div class="card">
+    <h3>🔢 交互计数器 <span class="badge">Counter</span></h3>
+    <div class="counter-display" id="counterVal" style="width: 100%; height: 400px;">0</div>
+    <div class="controls">
+      <button class="btn" data-action="counter-inc">+1</button>
+      <button class="btn secondary" data-action="counter-dec">-1</button>
+      <button class="btn danger" data-action="counter-reset">重置</button>
+    </div>
+    <div class="status" id="counterStatus" style="width: 100%; height: 400px;">点击按钮测试计数器</div>
+  </div>
+
+  <!-- 折线图 -->
+  <div class="card">
+    <h3>📈 折线图 <span class="badge">Line</span></h3>
+    <div id="lineChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="line-add">添加数据</button>
+      <button class="btn danger" data-action="line-reset">重置</button>
+    </div>
+    <div class="status" id="lineStatus" style="width: 100%; height: 400px;">点击按钮测试折线图</div>
+  </div>
+
+  <!-- 柱状图 -->
+  <div class="card">
+    <h3>📊 柱状图 <span class="badge">Bar</span></h3>
+    <div id="barChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="bar-add">添加部门</button>
+      <button class="btn danger" data-action="bar-reset">重置</button>
+    </div>
+    <div class="status" id="barStatus" style="width: 100%; height: 400px;">点击按钮测试柱状图</div>
+  </div>
+
+  <!-- 饼图 -->
+  <div class="card">
+    <h3>🍩 饼图 <span class="badge">Pie</span></h3>
+    <div id="pieChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="pie-random">随机数据</button>
+    </div>
+    <div class="status" id="pieStatus" style="width: 100%; height: 400px;">点击按钮测试饼图</div>
+  </div>
+
+  <!-- 散点图 -->
+  <div class="card">
+    <h3>🔵 散点图 <span class="badge">Scatter</span></h3>
+    <div id="scatterChart" class="chart-box" style="width: 100%; height: 400px;"></div>
+    <div class="controls">
+      <button class="btn" data-action="scatter-random">随机数据</button>
+    </div>
+    <div class="status" id="scatterStatus" style="width: 100%; height: 400px;">点击按钮测试散点图</div>
+  </div>
+
+  <!-- 滑块 -->
+  <div class="card">
+    <h3>🎚️ 滑块控制 <span class="badge">Slider</span></h3>
+    <div class="slider-row">
+      <span>0</span>
+      <input type="range" id="slider" min="0" max="100" value="50">
+      <span>100</span>
+    </div>
+    <div class="counter-display" id="sliderVal" style="height: 400px; font-size:32px;">50%</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="height: 400px; width:50%;"></div></div>
+    <div class="status" id="sliderStatus" style="width: 100%; height: 400px;">拖动滑块测试联动效果</div>
+  </div>
+
+  <!-- 标签选择 -->
+  <div class="card">
+    <h3>🏷️ 标签选择器 <span class="badge">Tags</span></h3>
+    <div class="tag-wrap" id="tagWrap" style="width: 100%; height: 400px;">
+      <span class="tag" data-tag="前端">前端</span>
+      <span class="tag" data-tag="后端">后端</span>
+      <span class="tag" data-tag="AI">AI</span>
+      <span class="tag" data-tag="大数据">大数据</span>
+      <span class="tag" data-tag="云计算">云计算</span>
+    </div>
+    <div class="status" id="tagStatus" style="width: 100%; height: 400px;">点击标签测试选择功能</div>
+  </div>
+</div>
+
+<script>
+// ===== 全局函数定义（必须在外层，供 onclick 使用）=====
+var lineData = [120, 200, 150, 280, 190, 320, 260];
+var lineMonths = ['1月','2月','3月','4月','5月','6月','7月'];
+var barData = [85, 92, 78, 88, 95];
+var barDepts = ['研发部','市场部','运营部','销售部','财务部'];
+var counter = 0;
+
+// 图表实例
+var lineChart, barChart, pieChart, scatterChart;
+
+function renderLine() {
+  lineChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 40, right: 20, top: 30, bottom: 30 },
+    xAxis: { type: 'category', data: lineMonths, axisLabel: { color: '#aaa' } },
+    yAxis: { type: 'value', axisLabel: { color: '#aaa' }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+    series: [{
+      name: '销售额', type: 'line', smooth: true, data: lineData,
+      lineStyle: { width: 3, color: '#00d2ff' },
+      itemStyle: { color: '#00d2ff' },
+      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,210,255,0.4)'},{offset:1,color:'rgba(0,210,255,0)'}]) }
+    }]
+  });
+}
+
+function renderBar() {
+  barChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 40, right: 20, top: 30, bottom: 30 },
+    xAxis: { type: 'category', data: barDepts, axisLabel: { color: '#aaa' } },
+    yAxis: { type: 'value', axisLabel: { color: '#aaa' }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+    series: [{
+      name: '绩效', type: 'bar', data: barData, barWidth: 30,
+      itemStyle: { borderRadius: [6,6,0,0], color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#7b2ff7'},{offset:1,color:'#00d2ff'}]) }
+    }]
+  });
+}
+
+function renderPie() {
+  pieChart.setOption({
+    tooltip: { trigger: 'item' },
+    legend: { bottom: 0, textStyle: { color: '#aaa' } },
+    series: [{
+      name: '市场份额', type: 'pie', radius: ['40%','70%'], center: ['50%','45%'],
+      itemStyle: { borderRadius: 8, borderColor: '#24243e', borderWidth: 2 },
+      label: { color: '#fff' },
+      data: [
+        { value: 35, name: '产品A' }, { value: 25, name: '产品B' },
+        { value: 20, name: '产品C' }, { value: 12, name: '产品D' }, { value: 8, name: '产品E' }
+      ]
+    }]
+  });
+}
+
+function renderScatter() {
+  var data = [];
+  for (var i = 0; i < 30; i++) {
+    data.push([Math.round(Math.random()*100), Math.round(Math.random()*100)]);
+  }
+  scatterChart.setOption({
+    tooltip: { trigger: 'item' },
+    grid: { left: 40, right: 20, top: 30, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { color: '#aaa' }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+    yAxis: { type: 'value', axisLabel: { color: '#aaa' }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } } },
+    series: [{
+      name: '样本点', type: 'scatter', data: data, symbolSize: 10,
+      itemStyle: { color: 'rgba(0,210,255,0.7)' }
+    }]
+  });
+}
+
+// ===== 初始化 =====
+window.onload = function() {
+  lineChart = echarts.init(document.getElementById('lineChart'));
+  barChart = echarts.init(document.getElementById('barChart'));
+  pieChart = echarts.init(document.getElementById('pieChart'));
+  scatterChart = echarts.init(document.getElementById('scatterChart'));
+
+  renderLine(); renderBar(); renderPie(); renderScatter();
+
+  // 滑块联动
+  var slider = document.getElementById('slider');
+  slider.addEventListener('input', function() {
+    var v = this.value;
+    document.getElementById('sliderVal').textContent = v + '%';
+    document.getElementById('progressFill').style.width = v + '%';
+    document.getElementById('sliderStatus').textContent = '🎚️ 滑块当前值：' + v + '%';
+  });
+
+  // 标签选择
+  var tags = document.querySelectorAll('.tag');
+  tags.forEach(function(t) {
+    t.addEventListener('click', function() {
+      tags.forEach(function(x) { x.classList.remove('active'); });
+      this.classList.add('active');
+      document.getElementById('tagStatus').textContent = '🏷️ 已选择：' + this.getAttribute('data-tag');
+    });
+  });
+
+  // 事件委托统一绑定按钮
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.btn');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+
+    if (action === 'counter-inc') {
+      counter++;
+      document.getElementById('counterVal').textContent = counter;
+      document.getElementById('counterStatus').textContent = '🔢 已加1，当前值：' + counter;
+    } else if (action === 'counter-dec') {
+      counter--;
+      document.getElementById('counterVal').textContent = counter;
+      document.getElementById('counterStatus').textContent = '🔢 已减1，当前值：' + counter;
+    } else if (action === 'counter-reset') {
+      counter = 0;
+      document.getElementById('counterVal').textContent = 0;
+      document.getElementById('counterStatus').textContent = '🔢 已重置为 0';
+    } else if (action === 'line-add') {
+      var n = lineMonths.length + 1;
+      lineMonths.push(n + '月');
+      lineData.push(Math.round(Math.random()*200 + 100));
+      renderLine();
+      document.getElementById('lineStatus').textContent = '📈 已添加数据点，共 ' + lineData.length + ' 个';
+    } else if (action === 'line-reset') {
+      lineData = [120, 200, 150, 280, 190, 320, 260];
+      lineMonths = ['1月','2月','3月','4月','5月','6月','7月'];
+      renderLine();
+      document.getElementById('lineStatus').textContent = '📈 已重置折线图';
+    } else if (action === 'bar-add') {
+      var names = ['技术部','客服部','行政部','产品部'];
+      barDepts.push(names[barDepts.length % names.length] + (barDepts.length+1));
+      barData.push(Math.round(Math.random()*40 + 60));
+      renderBar();
+      document.getElementById('barStatus').textContent = '📊 已添加部门，共 ' + barData.length + ' 个';
+    } else if (action === 'bar-reset') {
+      barData = [85, 92, 78, 88, 95];
+      barDepts = ['研发部','市场部','运营部','销售部','财务部'];
+      renderBar();
+      document.getElementById('barStatus').textContent = '📊 已重置柱状图';
+    } else if (action === 'pie-random') {
+      var vals = [35,25,20,12,8].map(function() { return Math.round(Math.random()*30 + 5); });
+      pieChart.setOption({
+        series: [{ data: [
+          { value: vals[0], name: '产品A' }, { value: vals[1], name: '产品B' },
+          { value: vals[2], name: '产品C' }, { value: vals[3], name: '产品D' }, { value: vals[4], name: '产品E' }
+        ]}]
+      });
+      document.getElementById('pieStatus').textContent = '🍩 已随机生成新的市场份额数据';
+    } else if (action === 'scatter-random') {
+      renderScatter();
+      document.getElementById('scatterStatus').textContent = '🔵 已随机生成 30 个新样本点';
+    }
+  });
+
+  // 窗口自适应
+  window.addEventListener('resize', function() {
+    lineChart.resize(); barChart.resize(); pieChart.resize(); scatterChart.resize();
+  });
+};
+</script>
+</body>
+</html>
